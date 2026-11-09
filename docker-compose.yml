@@ -1,0 +1,24 @@
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: car_rental_mysql
+    environment:
+      MYSQL_DATABASE: car_rental_db
+      MYSQL_ROOT_PASSWORD: ''
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./database/car_rental_db.sql:/docker-entrypoint-initdb.d/car_rental_db.sql
+
+  backend:
+    build: ./car-rental-api
+    container_name: car_rental_backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/car_rental_db?useSSL=false&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=
